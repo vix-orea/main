@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gaming Brand & Category Selector</title>
+  <style>
+    :root {
+      --primary-red: #c01a1a;
+      --hover-red: #d02b2b;
+      --accent-red: #ff4444;
+      --dark-bg: #1a1a1a;
+      --darker-bg: #020000;
+      --text-light: #f8f7f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Trebuchet MS', sans-serif;
+      padding: 20px;
+      min-height: 100vh;
+      background: linear-gradient(to bottom, #000000, #350000);
+      color: var(--text-light);
+      opacity: 0;
+      transform: translateX(-50px);
+      animation: fadeInFromLeft 1s ease-out forwards;
+    }
+    
+    @keyframes fadeInFromLeft {
+      0% {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    /* Main layout */
+    #main-container {
+      display: flex;
+      gap: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+      align-items: flex-start;
+    }
+
+    /* Selection panel */
+    #selection-panel {
+      flex: 0 0 400px;
+      background: rgba(34, 34, 34, 0.8);
+      padding: 25px;
+      border-radius: 12px;
+      border: 1px solid var(--primary-red);
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+    }
+
+    #header-container {
+      transition: all 0.5s ease;
+    }
+
+    #titles {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: fit-content;
+    }
+
+    /* Results panel */
+    #results-panel {
+      flex: 1;
+      min-height: 600px;
+    }
+
+    /* Typography */
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    h1 {
+      color: var(--accent-red);
+      text-shadow: 0 0 10px rgba(255, 68, 68, 0.6);
+      margin-bottom: 5px;
+      font-size: 28px;
+    }
+
+    h2 {
+      color: #ff6b6b;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    h3 {
+      color: #ff8a8a;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    /* Selection options */
+    .selection-options {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 25px;
+    }
+    
+    .selection-options li {
+      padding: 12px 18px;
+      background-color: var(--darker-bg);
+      color: var(--text-light);
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      flex: 1 1 auto;
+      min-width: 90px;
+      text-align: center;
+      font-size: 14px;
+      border: 2px solid transparent;
+      user-select: none;
+    }
+    
+    .selection-options li:hover {
+      background-color: #15171a;
+      transform: translateY(-2px);
+    }
+    
+    .selection-options li.selected {
+      background-color: var(--primary-red);
+      border: 2px solid var(--accent-red);
+      box-shadow: 0 0 15px rgba(192, 26, 26, 0.4);
+    }
+
+    .selection-options li.selected:hover {
+      background-color: var(--hover-red);
+    }
+
+    /* Filter and sort controls */
+    #sort-container {
+      display: none;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    .filter-section {
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .filter-section label {
+      display: block;
+      margin-bottom: 8px;
+      color: #ff8a8a;
+      font-weight: bold;
+    }
+
+    /* Dropdown styling */
+    select {
+      background-color: var(--dark-bg);
+      color: white;
+      border: 1px solid var(--primary-red);
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-family: 'Trebuchet MS';
+      font-size: 14px;
+      cursor: pointer;
+      width: 180px;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20256%20256%22%3E%3Cpath%20fill%3D%22%23c01a1a%22%20d%3D%22M225.813%2C48.907%2C128%2C146.72%2C30.187%2C48.907%2C0%2C79.093l22.4%2C22.4L128%2C191.093l102.4-102.4L252.8%2C68.28Z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 12px;
+    }
+
+    select:hover {
+      background-color: #2a2a2a;
+      border-color: var(--accent-red);
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--accent-red);
+      box-shadow: 0 0 5px rgba(192, 26, 26, 0.5);
+    }
+
+    /* Reset button */
+    .reset-btn {
+      background-color: var(--primary-red);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'Trebuchet MS';
+      font-size: 14px;
+      margin-top: 15px;
+      transition: all 0.3s ease;
+      width: 100%;
+      font-weight: bold;
+    }
+    
+    .reset-btn:hover {
+      background-color: var(--hover-red);
+      transform: translateY(-2px);
+    }
+
+    /* Product display */
+    .image-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      justify-items: center;
+    }
+
+    .image-item {
+      width: 220px;
+      text-align: center;
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+
+    .image-item:hover {
+      transform: translateY(-5px);
+    }
+
+    .image-item img {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border: 1px solid var(--primary-red);
+      border-radius: 8px;
+    }
+
+    /* Product labels */
+    .label {
+      font-family: 'Segoe UI', sans-serif;
+      margin-top: 5px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    /* Product name styling */
+    .image-item .label:first-of-type {
+      color: #ee2727;
+      font-size: 16px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+      margin-top: 8px;
+    }
+
+    /* Price text styling */
+    .image-item .label:nth-of-type(2) {
+      color: #ff6b6b;
+      font-weight: 800;
+      text-shadow: 0 0 6px rgba(255, 107, 107, 0.4);
+      font-size: 14px;
+    }
+
+    /* Type text styling */
+    .image-item .label:nth-of-type(3) {
+      color: #f03b3b;
+      font-weight: 700;
+      text-shadow: 0 0 5px rgba(255, 51, 51, 0.4);
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    /* Hover effects on product items */
+    .image-item:hover .label:first-of-type {
+      color: #e6e3e3;
+      text-shadow: 0 0 15px rgba(255, 26, 26, 0.8);
+      transform: scale(1.05);
+    }
+
+    /* Glow effect for selected items */
+    .image-item:hover::before {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      background: radial-gradient(circle, rgba(255,0,0,0.2) 0%, transparent 70%);
+      z-index: -1;
+      border-radius: 12px;
+    }
+
+    /* Loading state */
+    .loading {
+      text-align: center;
+      font-style: italic;
+      color: #ccc;
+      padding: 100px 0;
+      font-size: 18px;
+    }
+
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 100px 0;
+      text-align: center;
+    }
+
+    .empty-state p {
+      margin: 10px 0;
+      font-size: 18px;
+      color: #ff8a8a;
+    }
+
+    /* Pagination */
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 30px 0;
+      gap: 15px;
+      padding: 20px;
+      background: rgba(26, 26, 26, 0.8);
+      border-radius: 12px;
+      border: 1px solid var(--primary-red);
+    }
+
+    .pagination-btn {
+      background-color: var(--dark-bg);
+      color: white;
+      border: 1px solid var(--primary-red);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'Trebuchet MS';
+      font-size: 14px;
+      transition: all 0.3s ease;
+      min-width: 100px;
+    }
+
+    .pagination-btn:hover:not(.disabled) {
+      background-color: #2a2a2a;
+      border-color: var(--accent-red);
+      transform: translateY(-2px);
+    }
+
+    .pagination-btn.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .page-info {
+      color: #ff8a8a;
+      font-size: 14px;
+      margin: 0 10px;
+    }
+
+    /* Responsive design */
+    @media (max-width: 1024px) {
+      #main-container {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      #selection-panel {
+        flex: none;
+        width: 100%;
+        position: static;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .image-container {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 15px;
+      }
+      
+      .image-item {
+        width: 160px;
+      }
+      
+      .image-item img {
+        width: 150px;
+        height: 150px;
+      }
+      
+      .selection-options {
+        flex-direction: column;
+      }
+      
+      .selection-options li {
+        min-width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+      }
+      
+      .image-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 15px;
+        justify-items: center;
+        align-items: center;
+      }
+      
+      #selection-panel {
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      h2 {
+        font-size: 18px;
+      }
+      
+      h3 {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="main-container">
+  <!-- Left Panel: Selections and Filters -->
+  <div id="selection-panel">
+    <div id="header-container">
+      <div id="titles">
+        <h1>Gaming Peripheral Finder</h1>
+        <h2>Select Your Gaming Brand & Category</h2>
+        <h3>Choose a Brand:</h3>
+        <ul id="brand-options" class="selection-options">
+          <li data-brand="Logitech">Logitech</li>
+          <li data-brand="Razer">Razer</li>
+          <li data-brand="Corsair">Corsair</li>
+
+          
+        </ul>
+
+        <h3>Choose a Category:</h3>
+        <ul id="category-options" class="selection-options">
+          <li data-category="Mice">Mice</li>
+          <li data-category="Keyboards">Keyboards</li>
+          <li data-category="Headsets">Headsets</li>
+          <li data-category="Mousepads">Mousepads</li>
+        </ul>
+        
+        <button class="reset-btn" id="reset-button">Reset Selections</button>
+      </div>
+      <div id="sort-container">
+        <div class="filter-section">
+          <label for="sort-select">Sort by Price:</label>
+          <select id="sort-select">
+            <option value="none">All</option>
+            <option value="asc">Lowest to Highest</option>
+            <option value="desc">Highest to Lowest</option>
+          </select>
+        </div>
+
+        <!-- Dropdown for Wired/Wireless filter -->
+        <div id="filter-dropdown" class="filter-section">
+          <label for="wireless-filter">Filter by Type:</label>
+          <select id="wireless-filter">
+            <option value="">All</option>
+            <option value="Wired">Wired</button>
+            <option value="Wireless">Wireless</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Panel: Results -->
+  <div id="results-panel">
+    <div id="display"></div>
+    <!-- Pagination will be inserted here -->
+  </div>
+</div>
+
+<script>
+  /* All products can be sorted depending on connectivity or price range with an accurate sorting system. 
+     Functional Selection Reset button to reset user selection. 
+     Duplicated one type of mouse to test functional paging system */
+  const peripherals = [
+    // Choose Logitech for Mice Category, products have embedded links that bring you to actual products.
+    {
+      name: "G102",
+      price: "₱2,195.00",
+      image: "https://resource.logitech.com/w_544,h_466,ar_7:6,c_pad,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/refreshed-g203/2025-update/g203-mouse-top-angle-black-gallery-1.png",
+      link: "https://www.logitech.com/en-ph/shop/p/g203-lightsync-rgb-gaming-mouse.910-005802",
+      brand: "Logitech",
+      category: "Mice",
+      type: "Wired"
+    },
+    {
+      name: "G304",
+      price: "₱2,495.00",
+      image: "https://resource.logitech.com/w_544,h_466,ar_7:6,c_pad,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/g305/2025-update/g305-lightspeed-mouse-top-angle-black-gallery-1.png",
+      link: "https://www.logitech.com/en-ph/shop/p/g305-lightspeed-wireless-gaming-mouse.910-005284",
+      brand: "Logitech",
+      category: "Mice",
+      type: "Wireless"
+    },
+    {
+      name: "G502 X Lightspeed",
+      price: "₱3,295.00",
+      image: "https://resource.logitech.com/w_544,h_466,ar_7:6,c_pad,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/g502x-lightspeed/gallery/g502-x-lightspeed-mouse-top-angle-black-gallery-1.png",
+      link: "https://www.logitech.com/en-ph/shop/p/g502-x-wireless-lightforce.910-006182",
+      brand: "Logitech",
+      category: "Mice",
+      type: "Wireless"
+    },
+    {
+      name: "MX Master 4",
+      price: "₱3,695.00",
+      image: "https://resource.logitech.com/content/dam/logitech/en/products/mice/mx-master-4-business/gallery-images/b2b-mx-master-4-for-business-mouse-top-angle-image-1.png",
+      link: "https://www.logitech.com/en-ph/shop/p/mx-master-4.910-007565",
+      brand: "Logitech",
+      category: "Mice",
+      type: "Wireless"
+    },
+    {
+      name: "Pro X Superlight",
+      price: "₱3,795.00",
+      image: "https://resource.logitech.com/w_544,h_466,ar_7:6,c_pad,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/pro-x-superlight-2/new-gallery-assets-2025/pro-x-superlight-2-mice-top-angle-black-gallery-1.png",
+      link: "https://www.logitech.com/en-ph/shop/p/pro-x2-superlight-wireless-mouse.910-006632",
+      brand: "Logitech",
+      category: "Mice",
+      type: "Wireless"
+    },
+    {
+      name: "G705",
+      price: "₱3,895.00",
+      image: "https://resource.logitech.com/w_544,h_466,ar_7:6,c_pad,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/mouse/g705-wireless-mouse/gallery/g705-gallery-3.png",
+      link: "https://www.logitech.com/en-ph/shop/p/g705-wireless-gaming-mouse.910-006369",
+      brand: "Logitech",
+      category: "Mice",
+      type: "Wireless"
+    },
+    {
+      name: "G903",
+      price: "₱4,000.00",
+      image: "https://resource.logitech.com/w_544,h_466,ar_7:6,c_pad,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/g903-hero/2025-update/g903-lightspeed-mouse-top-angle-gallery-1.png",
+      link: "https://www.logitech.com/en-ph/shop/p/g903-hero-wireless-gaming-mouse.910-005674",
+      brand: "Logitech",
+      category: "Mice",
+      type: "Wireless"
+    },
+    {
+      name: "G903",
+      price: "₱4,000.00",
+      image: "https://resource.logitech.com/w_544,h_466,ar_7:6,c_pad,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/g903-hero/2025-update/g903-lightspeed-mouse-top-angle-gallery-1.png",
+      link: "https://www.logitech.com/en-ph/shop/p/g903-hero-wireless-gaming-mouse.910-005674",
+      brand: "Logitech",
+      category: "Mice",
+      type: "Wireless"
+    },
+    {
+      name: "G903",
+      price: "₱4,000.00",
+      image: "https://resource.logitech.com/w_544,h_466,ar_7:6,c_pad,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/g903-hero/2025-update/g903-lightspeed-mouse-top-angle-gallery-1.png",
+      link: "https://www.logitech.com/en-ph/shop/p/g903-hero-wireless-gaming-mouse.910-005674",
+      brand: "Logitech",
+      category: "Mice",
+      type: "Wireless"
+    },
+    {
+      name: "G903",
+      price: "₱4,000.00",
+      image: "https://resource.logitech.com/w_544,h_466,ar_7:6,c_pad,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/g903-hero/2025-update/g903-lightspeed-mouse-top-angle-gallery-1.png",
+      link: "https://www.logitech.com/en-ph/shop/p/g903-hero-wireless-gaming-mouse.910-005674",
+      brand: "Logitech",
+      category: "Mice",
+      type: "Wireless"
+    },
+    {
+      name: "G903",
+      price: "₱4,000.00",
+      image: "https://resource.logitech.com/w_544,h_466,ar_7:6,c_pad,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/g903-hero/2025-update/g903-lightspeed-mouse-top-angle-gallery-1.png",
+      link: "https://www.logitech.com/en-ph/shop/p/g903-hero-wireless-gaming-mouse.910-005674",
+      brand: "Logitech",
+      category: "Mice",
+      type: "Wireless"
+    },
+    {
+      name: "G903",
+      price: "₱4,000.00",
+      image: "https://resource.logitech.com/w_544,h_466,ar_7:6,c_pad,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/g903-hero/2025-update/g903-lightspeed-mouse-top-angle-gallery-1.png",
+      link: "https://www.logitech.com/en-ph/shop/p/g903-hero-wireless-gaming-mouse.910-005674",
+      brand: "Logitech",
+      category: "Mice",
+      type: "Wireless"
+    },
+    
+    
+    // Choose Razer for Keyboards Category.
+    {
+      name: "Huntsman V3 Pro 8KHz",
+      price: "₱4,000.00",
+      image: "https://assets3.razerzone.com/eivnbSUVahbSO6ZCQBW7mP2YN6o=/300x300/https%3A%2F%2Fmedias-p1.phoenix.razer.com%2Fsys-master-phoenix-images-container%2Fh62%2Fh24%2F9980311044126%2Fhuntsman-v3-pro-8khz-b-500x500.png",
+      link: "https://www.razer.com/ap-en/gaming-keyboards/razer-huntsman-v3-pro-8khz/RZ03-05530100-R3M1",
+      brand: "Razer",
+      category: "Keyboards",
+      type: "Wired"
+    },
+    {
+      name: "Huntsman Mini",
+      price: "₱3,895.00",
+      image: "https://assets3.razerzone.com/CRyih_9MEvMH08nzr0ahzTudnhI=/300x300/https%3A%2F%2Fmedias-p1.phoenix.razer.com%2Fsys-master-phoenix-images-container%2Fh86%2Fhd7%2F9668722655262%2Fhuntsman-mini-mercury-4-500x500.png",
+      link: "https://www.razer.com/ap-en/gaming-keyboards/razer-huntsman-mini/RZ03-03390300-R3M1",
+      brand: "Razer",
+      category: "Keyboards",
+      type: "Wired"
+    },
+    {
+      name: "BlackWidow V4 Pro",
+      price: "₱3,995.00",
+      image: "https://assets3.razerzone.com/tbfXUXyLrdlSlQ8PzreepqWMd0k=/300x300/https%3A%2F%2Fmedias-p1.phoenix.razer.com%2Fsys-master-phoenix-images-container%2Fh2a%2Fhd3%2F9538807103518%2Fblackwidow-v3-black-5-500x500.png",
+      link: "https://www.razer.com/ap-en/gaming-keyboards/razer-blackwidow-v4-pro/RZ03-04681800-R3M1",
+      brand: "Razer",
+      category: "Keyboards",
+      type: "Wireless"
+    },
+    {
+      name: "Ornata V3 X",
+      price: "₱3,795.00",
+      image: "https://assets3.razerzone.com/6b3GUtswedZf-F2HKyrLuAFjDWQ=/300x300/https%3A%2F%2Fmedias-p1.phoenix.razer.com%2Fsys-master-phoenix-images-container%2Fhd8%2Fh69%2F9502654332958%2Fornata-v3-2-x-500x500.png",
+      link: "https://www.razer.com/ap-en/gaming-keyboards/razer-ornata-v3-x/RZ03-04470100-R3M1",
+      brand: "Razer",
+      category: "Keyboards",
+      type: "Wired"
+    },
+    {
+      name: "Joro",
+      price: "₱3,695.00",
+      image: "https://assets3.razerzone.com/b_OoSea60h80hdBMrWPbBpaEvh8=/300x300/https%3A%2F%2Fmedias-p1.phoenix.razer.com%2Fsys-master-phoenix-images-container%2Fh6c%2Fh92%2F9904339288094%2Fjoro-500x500.png",
+      link: "https://www.razer.com/ap-en/gaming-keyboards/razer-joro/RZ03-02360100-R3M1",
+      brand: "Razer",
+      category: "Keyboards",
+      type: "Wireless"
+    },
+    {
+      name: "Pro Type Ultra",
+      price: "₱3,395.00",
+      image: "https://assets3.razerzone.com/dskwa_GYE7zZbDyP1FLFOZepovk=/300x300/https%3A%2F%2Fmedias-p1.phoenix.razer.com%2Fsys-master-phoenix-images-container%2Fh37%2Fhda%2F9257514041374%2F211102-pro-type-ultra-500x500.png",
+      link: "https://www.razer.com/ap-en/gaming-keyboards/razer-pro-type-ultra/RZ03-04110100-R3M1",
+      brand: "Razer",
+      category: "Keyboards",
+      type: "Wireless"
+    },
+    
+    // Choose Corsair for Headsets category.
+    {
+      name: "Virtuoso Max",
+      price: "₱4,000.00",
+      image: "https://assets.corsair.com/image/upload/f_auto/q_auto/v1742462768/virtuoso-max.png",
+      link: "https://www.corsair.com/ww/en/p/gaming-headsets/ca-9011372-ww/virtuoso-max-wireless-gaming-headset-carbon-ca-9011372-ww",
+      brand: "Corsair",
+      category: "Headsets",
+      type: "Wireless"
+    },
+    {
+      name: "Void Wireless V2",
+      price: "₱3,995.00",
+      image: "https://assets.corsair.com/image/upload/f_auto/q_auto/v1744914506/products/Gaming-Headsets/void-wireless-v2/void_v2.png",
+      link: "https://www.corsair.com/ww/en/p/gaming-headsets/ca-9011379-ww/void-wireless-v2-gaming-headset-carbon-ca-9011379-ww",
+      brand: "Corsair",
+      category: "Headsets",
+      type: "Wireless"
+    },
+    {
+      name: "HS80 Max Premium",
+      price: "₱3,895.00",
+      image: "https://assets.corsair.com/image/upload/c_pad,q_85,h_360,w_360/products/Gaming-Headsets/base-hs80max-xbox-config/gallery/hs80max_wl_xbox_01.webp",
+      link: "https://www.corsair.com/ww/en/p/gaming-headsets/ca-9011387-ww/hs80-max-premium-wireless-gaming-headset-for-xbox-with-spatial-audio-ca-9011387-ww",
+      brand: "Corsair",
+      category: "Headsets",
+      type: "Wireless"
+    },
+    {
+      name: "HS55 Surround V2",
+      price: "₱3,795.00",
+      image: "https://assets.corsair.com/image/upload/c_pad,q_85,h_360,w_360/products/Gaming-Headsets/CA-9011265-NA/Gallery/CA-9011265-NA_01.webp",
+      link: "https://www.corsair.com/ww/en/p/gaming-headsets/ca-9011389-ww/hs55-surround-v2-wired-gaming-headset-carbon-ca-9011389-ww",
+      brand: "Corsair",
+      category: "Headsets",
+      type: "Wired"
+    },
+    
+    // All brands for Mousepads category, one product for two brands. No Wired/Wireless sorting system for this category.
+    {
+      name: "Gigantus V2",
+      price: "₱795.00",
+      image: "https://assets3.razerzone.com/TZsQmLK-bFNyRVpK-oICL0hrIy0=/78x78/https%3A%2F%2Fmedias-p1.phoenix.razer.com%2Fsys-master-phoenix-images-container%2Fhbb%2Fhde%2F9480343257118%2F230220-evisu-gigantus-v2-large-1500x1000-3.jpg",
+      link: "https://www.razer.com/ap-en/gaming-mouse-mats/razer-gigantus-v2/RZ02-03333000-R3M1",
+      brand: "Razer",
+      category: "Mousepads",
+    },
+    {
+      name: "MM300 2XL",
+      price: "₱895.00",
+      image: "https://assets.corsair.com/image/upload/c_pad,q_85,h_360,w_360/products/Gaming-Mousepads/CH-941307X-WW/gallery/mm300_starladder_01.webp",
+      link: "https://www.corsair.com/ww/en/p/mousepads/ch-941307x-ww/mm300-2xl-gaming-mouse-pad-budapest-edition-ch-941307x-ww",
+      brand: "Corsair",
+      category: "Mousepads",
+    },
+    
+  ];
+
+  // State management
+  const state = {
+    selectedBrand: null,
+    selectedCategory: null,
+    currentSortOrder: "none",
+    filterType: null,
+    isCategoryChange: false,
+    currentPage: 1,
+    itemsPerPage: 9
+  };
+
+  // DOM elements
+  const displayDiv = document.getElementById("display");
+  const sortContainer = document.getElementById("sort-container");
+  const sortSelect = document.getElementById("sort-select");
+  const filterDropdownDiv = document.getElementById("filter-dropdown");
+  const wirelessFilterSelect = document.getElementById("wireless-filter");
+  const resetButton = document.getElementById("reset-button");
+
+  // Initialize event listeners
+  function initEventListeners() {
+    // Brand selection
+    document.querySelectorAll("#brand-options li").forEach(li => {
+      li.addEventListener("click", handleBrandSelection);
+    });
+
+    // Category selection
+    document.querySelectorAll("#category-options li").forEach(li => {
+      li.addEventListener("click", handleCategorySelection);
+    });
+
+    // Sorting
+    sortSelect.addEventListener("change", handleSortChange);
+
+    // Filter
+    wirelessFilterSelect.addEventListener("change", handleFilterChange);
+
+    // Reset button
+    resetButton.addEventListener("click", resetSelections);
+  }
+
+  // Event handlers
+  function handleBrandSelection(e) {
+    const li = e.currentTarget;
+    document.querySelectorAll("#brand-options li").forEach(item => {
+      item.classList.remove("selected");
+    });
+    li.classList.add("selected");
+    state.selectedBrand = li.getAttribute("data-brand");
+    state.isCategoryChange = true;
+    state.currentPage = 1;
+    checkSelectionsAndUpdate();
+  }
+
+  function handleCategorySelection(e) {
+    const li = e.currentTarget;
+    document.querySelectorAll("#category-options li").forEach(item => {
+      item.classList.remove("selected");
+    });
+    li.classList.add("selected");
+    state.selectedCategory = li.getAttribute("data-category");
+    state.isCategoryChange = true;
+    state.currentPage = 1;
+    checkCategoryAndToggleDropdown();
+    checkSelectionsAndUpdate();
+  }
+
+  function handleSortChange(e) {
+    state.currentSortOrder = sortSelect.value;
+    state.isCategoryChange = false;
+    updateDisplay();
+  }
+
+  function handleFilterChange(e) {
+    const selectedOption = wirelessFilterSelect.value;
+    state.filterType = selectedOption || null;
+    state.isCategoryChange = false;
+    state.currentPage = 1;
+    updateDisplay();
+  }
+
+  function checkSelectionsAndUpdate() {
+    if (state.selectedBrand && state.selectedCategory) {
+      sortContainer.style.display = "flex";
+    } else {
+      sortContainer.style.display = "none";
+    }
+    updateDisplay();
+  }
+
+  function checkCategoryAndToggleDropdown() {
+    if (["Mice", "Keyboards", "Headsets"].includes(state.selectedCategory)) {
+      filterDropdownDiv.style.display = "block";
+    } else {
+      filterDropdownDiv.style.display = "none";
+      state.filterType = null;
+      wirelessFilterSelect.value = "";
+    }
+  }
+
+  function updateDisplay() {
+    if (state.isCategoryChange) {
+      showLoading();
+      setTimeout(renderDisplayContent, 300);
+    } else {
+      renderDisplayContent();
+    }
+    
+    state.isCategoryChange = false;
+  }
+
+  function showLoading() {
+    displayDiv.innerHTML = `
+      <div class="loading-container">
+        <p class="loading">Loading...</p>
+      </div>
+    `;
+  }
+
+  function renderDisplayContent() {
+    displayDiv.innerHTML = "";
+
+    // Show prompt if no selections made
+    if (!state.selectedBrand || !state.selectedCategory) {
+      displayDiv.innerHTML = `
+        <div class="empty-state">
+          <p>Please select a brand and a category.</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Filter peripherals
+    let filtered = peripherals.filter(
+      p => p.brand === state.selectedBrand && p.category === state.selectedCategory
+    );
+
+    // Apply wired/wireless filter
+    if (["Mice", "Keyboards", "Headsets"].includes(state.selectedCategory)) {
+      if (state.filterType) {
+        filtered = filtered.filter(p => p.type === state.filterType);
+      }
+    }
+
+    // Show empty state if no results
+    if (filtered.length === 0) {
+      displayDiv.innerHTML = `
+        <div class="empty-state">
+          <p>No peripherals found for this selection.</p>
+          <p>Try different filters or categories.</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Apply sorting
+    if (state.currentSortOrder === "asc") {
+      filtered.sort((a, b) => {
+        const priceA = parseFloat(a.price.replace(/[^\d.]/g, ''));
+        const priceB = parseFloat(b.price.replace(/[^\d.]/g, ''));
+        return priceA - priceB;
+      });
+    } else if (state.currentSortOrder === "desc") {
+      filtered.sort((a, b) => {
+        const priceA = parseFloat(a.price.replace(/[^\d.]/g, ''));
+        const priceB = parseFloat(b.price.replace(/[^\d.]/g, ''));
+        return priceB - priceA;
+      });
+    }
+
+    // Calculate pagination
+    const totalItems = filtered.length;
+    const totalPages = Math.ceil(totalItems / state.itemsPerPage);
+    
+    // Ensure current page is valid
+    if (state.currentPage > totalPages) {
+      state.currentPage = totalPages > 0 ? totalPages : 1;
+    }
+    
+    // Get items for current page
+    const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+    const endIndex = Math.min(startIndex + state.itemsPerPage, totalItems);
+    const itemsToShow = filtered.slice(startIndex, endIndex);
+
+    // Create image container
+    const imageContainer = document.createElement("div");
+    imageContainer.className = "image-container";
+
+    // Display items for current page
+    itemsToShow.forEach(peripheral => {
+      const itemDiv = document.createElement("div");
+      itemDiv.className = "image-item";
+
+      const link = document.createElement("a");
+      link.href = peripheral.link;
+      link.target = "_blank";
+      link.setAttribute("aria-label", `View details for ${peripheral.name}`);
+
+      const img = document.createElement("img");
+      img.src = peripheral.image;
+      img.alt = peripheral.name;
+
+      link.appendChild(img);
+      itemDiv.appendChild(link);
+
+      const nameDiv = document.createElement("div");
+      nameDiv.className = "label";
+      nameDiv.textContent = peripheral.name;
+
+      const priceDiv = document.createElement("div");
+      priceDiv.className = "label";
+      priceDiv.textContent = "Price: " + peripheral.price;
+
+      const typeDiv = document.createElement("div");
+      typeDiv.className = "label";
+      typeDiv.textContent = peripheral.type;
+
+      itemDiv.appendChild(nameDiv);
+      itemDiv.appendChild(priceDiv);
+      itemDiv.appendChild(typeDiv);
+
+      imageContainer.appendChild(itemDiv);
+    });
+
+    displayDiv.appendChild(imageContainer);
+
+    // Create pagination controls if needed
+    if (totalPages > 1) {
+      createPagination(totalPages, totalItems);
+    }
+  }
+
+  function createPagination(totalPages, totalItems) {
+    // Remove existing pagination
+    removePagination();
+
+    const paginationContainer = document.createElement("div");
+    paginationContainer.className = "pagination-container";
+
+    // Previous button
+    const prevButton = document.createElement("button");
+    prevButton.className = "pagination-btn";
+    prevButton.textContent = "« Previous";
+    prevButton.disabled = state.currentPage === 1;
+    if (prevButton.disabled) prevButton.classList.add("disabled");
+    prevButton.addEventListener("click", () => {
+      if (state.currentPage > 1) {
+        state.currentPage--;
+        updateDisplay();
+      }
+    });
+
+    // Next button
+    const nextButton = document.createElement("button");
+    nextButton.className = "pagination-btn";
+    nextButton.textContent = "Next »";
+    nextButton.disabled = state.currentPage === totalPages;
+    if (nextButton.disabled) nextButton.classList.add("disabled");
+    nextButton.addEventListener("click", () => {
+      if (state.currentPage < totalPages) {
+        state.currentPage++;
+        updateDisplay();
+      }
+    });
+
+    // Page info
+    const pageInfo = document.createElement("span");
+    pageInfo.className = "page-info";
+    pageInfo.textContent = `Page ${state.currentPage} of ${totalPages} (${totalItems} items total)`;
+
+    // Assemble pagination
+    paginationContainer.appendChild(prevButton);
+    paginationContainer.appendChild(pageInfo);
+    paginationContainer.appendChild(nextButton);
+
+    // Insert pagination after display
+    displayDiv.parentNode.insertBefore(paginationContainer, displayDiv.nextSibling);
+  }
+
+  function removePagination() {
+    const existingPagination = document.querySelector('.pagination-container');
+    if (existingPagination) {
+      existingPagination.remove();
+    }
+  }
+
+  function resetSelections() {
+    state.selectedBrand = null;
+    state.selectedCategory = null;
+    state.currentSortOrder = "none";
+    state.filterType = null;
+    state.isCategoryChange = false;
+    state.currentPage = 1;
+    state.itemsPerPage = 9;
+    
+    document.querySelectorAll("#brand-options li, #category-options li").forEach(li => {
+      li.classList.remove("selected");
+    });
+    
+    sortSelect.value = "none";
+    wirelessFilterSelect.value = "";
+    sortContainer.style.display = "none";
+    filterDropdownDiv.style.display = "none";
+    
+    updateDisplay();
+    removePagination();
+  }
+
+  // Initialize the application
+  function init() {
+    initEventListeners();
+    updateDisplay();
+  }
+
+  // Start the application when DOM is loaded
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
